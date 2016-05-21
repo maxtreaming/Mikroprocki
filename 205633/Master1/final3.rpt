@@ -1,6 +1,6 @@
 Report       : final3
 Date         : 05-21-2016
-Time         : 15:25:59
+Time         : 19:16:34
 
 Compiler     : BASCOM-AVR LIBRARY V 2.0.7.3
 Processor    : M644P
@@ -8,8 +8,8 @@ SRAM         : 1000 hex
 EEPROM       : 800 hex
 ROMSIZE      : 10000 hex
 
-ROMIMAGE     : 2FE hex  -> Will fit into ROM
-ROMIMAGE     :  766 dec
+ROMIMAGE     : 352 hex  -> Will fit into ROM
+ROMIMAGE     :  850 dec
 FLASH USED   :  1  %
 BAUD         : 115200 Baud
 XTAL         : 3686400 Hz
@@ -21,7 +21,7 @@ S-Stacksize  : 10 hex
 S-Stackstart : 10D8 hex
 Framesize    : 20 hex
 Framestart   : 10A8 hex
-Space left   :  4002  dec
+Space left   :  4001  dec
 
 LCD DB7      : PORTB.7
 LCD DB6      : PORTB.6
@@ -68,7 +68,8 @@ ADRW                             Byte              0100          256
 ADRO                             Byte              0101          257 
 NRODBIORNIKA                     Byte              0102          258 
 POMOCNICZA                       Byte              0103          259 
-STANODBIORU                      Byte              0104          260 
+STAN                             Byte              0104          260 
+STANODBIORU                      Byte              0105          261 
 
 --------------------------------------------------------------------------------
 Constant                         Value

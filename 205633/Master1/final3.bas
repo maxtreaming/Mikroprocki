@@ -16,7 +16,7 @@ $crystal = Fcrystal
 '$baud = Baundrs0    'zbêdne gdy inicjalizacja w zdefiniowanej procedurze
 
 $eeprom                                                     'zawartoœæ eeprom wgrywana na zasadzie programowania
-Data 15 , 14 , 13 , 1 , 9  , 11 , 8 , 6 , 4 , 0 , 0 , 0 , 0 , 0 , 0 ,0,       '0...15  wartosci w komorkach, to adresy urzadzen
+Data 15 , 14 , 13 , 1 , 9 , 11 , 8 , 6 , 4 , 0 , 0 , 0 , 0 , 0 , 0 , 0,       '0...15  wartosci w komorkach, to adresy urzadzen
 Data 18 , 22 , 19 , 22 , 18 , 20 , 20 , 20 , 24 , 6 , 6 , 6 , 6 , 6 , 6 , 6       'ile bajtow odbieramy od urzadzenia = (bof +ilosc danych+eof)+12 aby byc pewnym ze sie zmiesci . Min okolo 6
 
 $data
@@ -34,7 +34,7 @@ Led_pin Alias 5
 Led Alias Portd.led_pin                                     'definicja portow dla diody kontrolnej
 SBI Ddrd,Led_pin
 
-
+On Urxc Usart0_rx Nosave
 On Urxc1 Usart1_rx Nosave                                   'deklaracja przerwania URXC1 (odbiór znaku USART1)
 On Utxc1 Usart1_tx_end Nosave                               'deklaracja przerwania UTXC1, koniec nadawania
 
@@ -43,8 +43,8 @@ Dim Adrw As Byte                                            'adres w³asny
 Dim Adro As Byte                                            'adres odbiorcy 0...15
 Dim Nrodbiornika As Byte                                    'wskaznik do adresu odbiorcy w eeprom
 Dim Pomocnicza As Byte                                      'zmienna pomocnicza
-
-                                                             'ramka bof
+Dim Stan As Byte
+Stan = 0                                                    'ramka bof
 Const Bof_bit = &B110000000                                 'unikalna ramka bof dla mastera.
 Const Bofm_bit = &B11000010
 
@@ -107,7 +107,38 @@ Loop
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''PRZERWANIA'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ Usart0_rx:
+ push rstemp                                                'o ile potrzeba - sprawdziæ
+ Push rsdata
+ in rstemp,sreg                                             'o ile potrzeba  - sprawdziæ
+ push rstemp                                                'o ile potrzeba - sprawdziæ
 
+  in rsdata,udr0                                            'wywolanie proceduty odbioru danych z lini rs485
+  cpi rsdata,32
+   breq spacja
+   rjmp koniec_spacji
+
+   !spacja:
+   lds rstemp, {stan}
+      sbrs rstemp,0
+      Stop Timer1
+      sbrc rstemp,0
+      Start Timer1
+
+      sbrs rstemp,0
+      Stan = 1
+      sbrc rstemp,0
+      Stan = 0
+
+
+
+   !koniec_spacji:
+ pop rstemp
+ !out sreg,rstemp
+ pop rsdata
+ pop rstemp
+ Return
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Usart1_rx:
 
  push rstemp                                                'o ile potrzeba - sprawdziæ
@@ -169,6 +200,7 @@ Return
    sbi ddrd,Te_pin                                          'wyjœcie TE silnopr¹dowe
    'w³¹czenie przerwañ
    'Enable Urxc  niepotrzebne przerwanie od komputera
+   Enable Urxc
    Enable Urxc1
    Enable Utxc1
 ret
