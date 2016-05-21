@@ -2,7 +2,7 @@
 
 
 'obliczenia parametrów konfiguracyjnych
-Const Prescfc = 0                                           'potêga dzielnika czêstotliwoœci taktowania procesora
+Const Prescfc = 2                                           'potêga dzielnika czêstotliwoœci taktowania procesora
 Const Fcrystal =(14745600 /(2 ^ Prescfc))                   'czêstotliwoœæ po przeskalowaniu
 'sta³e konfiguracujne USARTów
 Const Baundrs0 = 115200                                     'prêdkoœæ transmisji po RS [bps] USART0

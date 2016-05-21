@@ -1,6 +1,6 @@
 Report       : final3
-Date         : 05-20-2016
-Time         : 18:39:55
+Date         : 05-21-2016
+Time         : 11:14:03
 
 Compiler     : BASCOM-AVR LIBRARY V 2.0.7.3
 Processor    : M644P
@@ -12,7 +12,7 @@ ROMIMAGE     : 2F6 hex  -> Will fit into ROM
 ROMIMAGE     :  758 dec
 FLASH USED   :  1  %
 BAUD         : 115200 Baud
-XTAL         : 14745600 Hz
+XTAL         : 3686400 Hz
 BAUD error   : 0.%
 
 Stack start  : 10FF hex
@@ -836,7 +836,7 @@ _RAMSIZE                         4096
 _ERAMSIZE                        2048
 _SIM                             0
 _BASE                            1
-_XTAL                            14745600
+_XTAL                            3686400
 _BUILD                           20730
 _COMPILER                        90
 _HWMUL                           1
@@ -854,19 +854,19 @@ _HWSTACK_LOW                      4311
 _SWSTACK_LOW                      4296
 _FRAME_HIGH                       4296
 _XMEGA                           0
-PRESCFC                          0
-FCRYSTAL                          14745600
+PRESCFC                          2
+FCRYSTAL                          3686400
 BAUNDRS0                         115200
-_UBRR0                            7
+_UBRR0                            1
 BAUNDRS1                         115200
-_UBRR1                            7
+_UBRR1                            1
 BOF_BIT                          &B110000000
 BOFM_BIT                         &B11000010
 EOF_BIT                          &B10000000
 EOFM_BIT                         &B10100010
 _PRESCTIMER1                     256
 _FPR1                            1
-_OCRTIMER1                        57599
+_OCRTIMER1                        14399
 _PRESCTIMER0                     1024
 _FPR0                            1
 _OCRTIMER0                       1
