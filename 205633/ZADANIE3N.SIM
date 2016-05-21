@@ -1,0 +1,37 @@
+|
+6|4
+16
+Row 0 Height: 16
+Row 1 Height: 16
+Row 2 Height: 16
+Row 3 Height: 16
+Row 4 Height: 16
+Row 5 Height: 16
+Column 0 Width: 125
+Column 1 Width: 131
+Column 2 Width: 73
+Column 3 Width: 160
+0|0|Variable
+1|0|Value
+2|0|Hex
+3|0|Bin
+0|1|R18
+1|1|28
+2|1|1C
+3|1|00011100
+0|2|r19
+1|2|28
+2|2|1C
+3|2|00011100
+0|3|sreg
+1|3|0
+2|3|0
+3|3|00000000
+0|4|aw
+1|4|28
+2|4|1C
+3|4|00011100
+0|5|ar
+1|5|28
+2|5|1C
+3|5|00011100

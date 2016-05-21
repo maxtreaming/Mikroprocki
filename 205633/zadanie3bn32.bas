@@ -1,0 +1,184 @@
+'program bufora danych wejœciowych bez u¿ycia przerwañ
+'rozmiar bufora 16 znaków, bufor w formie stringu
+'za wpisywanym znakiem jest dopisywany znak koñcz¹cy string
+'odbiór znaki 13 powoduje wys³anie zawartoœci bufora
+
+'kontynuacja zadania:
+'1. u¿yæ przerwania URXC
+'2. zmieniæ bufor na pierœcieniowy (najwczeœniej zapisane znaki s¹ zastêpowane
+'nowymi znakami, a odbiór znaku 13 ma powodowaæ zwrócenie odebranych znaków)
+'rozmiar bufora 16 lub 64 lub 256
+
+'wgranie bootloadera wymaga u¿ycia programatora STK500 native driver
+'po wgraniu bootloadera nale¿y zmieniæ typ programatopra i od³¹czyæ programator
+
+'u¿yæ bootloadera modyfikowanego MCS bez kodu dostêpu
+'W Options->Programmer:
+'1. ma byæ wybrany MCS Bootloader
+'2. poni¿ej w zak³adce MCS Loader: Reset: DTR
+
+'wymagane po³¹czenia:
+'USB_RS.TxD -> PD.0
+'USB_RS.Rxd -> PD.1
+'USB_RS.DTR -> Reset (pojedynczy ko³ek ko³o przycisku resetu)
+
+'by Marcin Kowalczyk
+
+'obliczenia parametrów konfiguracyjnych
+Const Prescfc = 3                                           'potêga dzielnika czêstotliwoœci taktowania procesora
+Const Fcrystal =(8000000 /(2 ^ Prescfc))                    'czêstotliwoœæ po przeskalowaniu
+'Const Fcrystal =(3686400 /(2 ^ Prescfc))       'czêstotliwoœæ po przeskalowaniu
+Const Baundrs = 115200                                      'prêdkoœæ transmisji po RS [bps]
+Const _ubrr =(((fcrystal / Baundrs) / 16) - 1)              'potrzebne w nastêpnych zadaniach
+'konfigurowanie mikrokontrolera
+$regfile = "m32def.dat"                                     'plik konfiguracyjny z literk¹ "p" w nazwie
+$crystal = Fcrystal
+$baud = Baundrs
+
+Const _presctimer = 1024
+Const _fpr = 10                                             'czêstotliwoœc próbkowania
+Const _ocrtimer = Fcrystal / _presctimer / _fpr -1
+
+
+Config Timer1 = Timer , Prescale = _presctimer , Compare A = Disconnect , Clear Timer = 1
+Stop Timer1
+Timer1 = 0
+Ocr1a = _ocrtimer
+
+On Oc1a Przerwanie Nosave
+
+
+
+Temp Alias R16                                              'aliasy rejestrów procesora
+Temph Alias R17
+Rstemp Alias R18
+Rsdata Alias R19
+
+'zmniejszenie czêstotliwoœci taktowania procesora
+'ldi temp,128
+'!Out clkpr,temp                                             'ustawienie bitu 7, CLKPR = 128
+'ldi temp,prescfc                                            'aktualizacja CLKPR dopiero po uprzednim ustawienu bitu 7
+'!Out clkpr,temp                                             'CLKPR = Prescfc
+
+'deklarowanie zmiennych
+Dim Aw As Byte                                              'offset zapisu
+Dim Ar As Byte                                              'offset odczytu
+Dim Ftx As Byte                                             'flaga nadawania, gdy niezerowa do nakaz nadawania
+Const Rb = 64                                               'rozmiar buffora
+Dim Bufor(rb) As Byte                                       'buffor danych wejœciowych
+
+
+Enable Oc1a
+Start Timer1
+sei
+
+Do
+   sbic ucsra,rxc                                           'obejœcie gdy nie obebrano znaku
+      rcall rs_rx
+
+   lds rstemp,{ar}
+   lds rsdata,{aw}
+   cpse rstemp,rsdata                                       'porównanie, przeskok gdy równe
+      rcall rs_tx                                           'procedura nadawania
+Loop
+
+Przerwanie:
+   push rstemp
+   in rstemp,sreg
+   push rstemp
+   push yl                                                  'o ile potrzeba  - sprawdziæ
+   push yh                                                  'o ile potrzeba  - sprawdziæ
+
+      in yl,portd
+      ldi rstemp,128
+      eor yl,rstemp
+      !out portd,yl
+
+
+
+   rcall rs_tx_init
+
+   'odtworzenie stanu jak przed przerwanie
+   pop yh                                                   'o ile potrzeba - sprawdziæ
+   pop yl                                                   'o ile potrzeba - sprawdziæ
+   pop rstemp                                               'o ile potrzeba - sprawdziæ
+   !out sreg,rstemp                                         'o ile potrzeba - sprawdziæ
+   pop rstemp                                               'o ile potrzeba - sprawdziæ
+
+
+
+Return
+
+!rs_rx:
+   in rsdata,udr                                            'przepianie znaku zeruje RXC0
+   'sprawdzenie czy polecenie wys³ania zawartoœci bufora
+   cpi rsdata,13
+   sbic sreg,1
+      sts {ftx},rsdata
+   ret
+
+
+   !rs_tx_init:
+
+   ldi rsdata,48
+
+   lds rstemp,{aw}                                          'offset zapisu
+   Loadadr Bufor(1) , Y                                     'za³adowanie adresu zmiennaj S do pary adrespowej Y (r28,r29)
+   'dodanie do adresu pocz¹tku offsetu
+   add yl,rstemp
+   ldi rstemp,0                                             'LDI nie zmienia SREG
+   adc yh,rstemp
+   st y,rsdata
+
+   lds rstemp,{aw}                                          'offset zapisu
+   inc rstemp
+   andi rstemp,(rb-1)                                       'maska rozmiaru buffora
+   sts {aw},rstemp                                          'zachowanie offsetu zapisu
+
+   lds rsdata,{ar}                                          'offset odczytu
+   cpse rstemp,rsdata                                       'porównanie, przeskok gdy równe
+      ret
+
+   inc rsdata
+   andi rsdata,(rb-1)                                       'maska rozmiaru buffora
+   sts {ar},rsdata                                          'zachowanie offsetu odczytu
+
+ret
+
+
+!rs_tx:
+   sbis ucsra,udre                                          'obejœcie gdy UDR0 zajêty
+      ret
+
+   'w rstemp offset odczytu
+   lds rsdata,{ftx}
+   tst rsdata
+   sbic sreg,1                                              'obejscie gdy z=0, niezerowy rstemp
+      ret
+
+
+   Loadadr Bufor(1) , Y                                     'za³adowanie adresu zmiennaj S do pary adrespowej Y (r28,r29)
+   'dodanie do adresu pocz¹tku offsetu
+   add yl,rstemp
+   ldi rstemp,0                                             'LDI nie zmienia SREG
+   adc yh,rstemp
+
+   ld rstemp,y
+   !out udr,rstemp                                          'zainicjowanie nadawania
+
+   lds rsdata,{ar}                                          'offset odczytu
+   inc rsdata
+   andi rsdata,(rb-1)                                       'maska rozmiaru buffora
+   sts {ar},rsdata                                          'zachowanie offsetu odczytu
+
+   lds rstemp,{aw}                                          'offset zapisu
+   cpse rstemp,rsdata                                       'porównanie, przeskok gdy równe
+      ret
+
+   ldi rstemp,0                                             'wyzerowanie flagi nadawania gdy AR=AW
+   sts {ftx},rstemp
+
+'   sbis ucsr0a,udre0       'obejœcie rjmp gdy UDR0 pusty - bit UDRE0 = 1
+'      rjmp rs_tx    'czakanie w pêtli na zwolnienie UDR0
+'   !out udr0,rsdata 'wpisanie nowego znaku do UDR0 - nie oznacza rozpoczêcia transmicji
+ret

@@ -1,0 +1,8 @@
+Error : 202   Line :   45    .EQU not found, probably using functions that are not supported by the selected chip [CLKPR]  , in File : I:\205633\zadanie3N.bas
+Error : 202   Line :   47    .EQU not found, probably using functions that are not supported by the selected chip [CLKPR]  , in File : I:\205633\zadanie3N.bas
+Error : 222   Line :   58    Illegal character [expected (, got '' [RXC0]]  , in File : I:\205633\zadanie3N.bas
+Error : 1     Line :   58    Unknown statement [.EQU not found for:UCSR0A]  , in File : I:\205633\zadanie3N.bas
+Error : 202   Line :   69    .EQU not found, probably using functions that are not supported by the selected chip [UDR0]  , in File : I:\205633\zadanie3N.bas
+Error : 222   Line :   103   Illegal character [expected (, got '' [UDRE0]]  , in File : I:\205633\zadanie3N.bas
+Error : 1     Line :   103   Unknown statement [.EQU not found for:UCSR0A]  , in File : I:\205633\zadanie3N.bas
+Error : 202   Line :   120   .EQU not found, probably using functions that are not supported by the selected chip [UDR0]  , in File : I:\205633\zadanie3N.bas
