@@ -1,6 +1,6 @@
 Report       : final3
 Date         : 05-21-2016
-Time         : 11:14:03
+Time         : 15:25:59
 
 Compiler     : BASCOM-AVR LIBRARY V 2.0.7.3
 Processor    : M644P
@@ -8,8 +8,8 @@ SRAM         : 1000 hex
 EEPROM       : 800 hex
 ROMSIZE      : 10000 hex
 
-ROMIMAGE     : 2F6 hex  -> Will fit into ROM
-ROMIMAGE     :  758 dec
+ROMIMAGE     : 2FE hex  -> Will fit into ROM
+ROMIMAGE     :  766 dec
 FLASH USED   :  1  %
 BAUD         : 115200 Baud
 XTAL         : 3686400 Hz

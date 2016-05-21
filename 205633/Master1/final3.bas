@@ -16,7 +16,7 @@ $crystal = Fcrystal
 '$baud = Baundrs0    'zbêdne gdy inicjalizacja w zdefiniowanej procedurze
 
 $eeprom                                                     'zawartoœæ eeprom wgrywana na zasadzie programowania
-Data 15 , 14 , 13 , 1 , 9 , 11 , 8 , 6 , 4 , 0 , 0 , 0 , 0 , 0 , 0 , 0       '0...15  wartosci w komorkach, to adresy urzadzen
+Data 15 , 14 , 13 , 1 , 9  , 11 , 8 , 6 , 4 , 0 , 0 , 0 , 0 , 0 , 0 ,0,       '0...15  wartosci w komorkach, to adresy urzadzen
 Data 18 , 22 , 19 , 22 , 18 , 20 , 20 , 20 , 24 , 6 , 6 , 6 , 6 , 6 , 6 , 6       'ile bajtow odbieramy od urzadzenia = (bof +ilosc danych+eof)+12 aby byc pewnym ze sie zmiesci . Min okolo 6
 
 $data
@@ -176,17 +176,6 @@ ret
 !Wyslij_ramke:
 !CLI
     Stanodbioru = 0
-       ldi rstemp, 10                                       'wyslij trzy znaki: przejscia do kolejnej linii->idz na poczatek linii->wydrukuj 0
- rcall pusty_udr0
-  !out udr0,rstemp
-
-   ldi rstemp, 13
- rcall pusty_udr0
-  !out udr0,rstemp
-
-   ldi rstemp, 48
- rcall pusty_udr0
-  !out udr0,rstemp
 
 
 
@@ -195,6 +184,10 @@ ret
    Readeeprom Adro , Nrodbiornika                           'odczyt adresu odbiornika z listy eeprom
 
  lds rstemp,{adro}                                          'zaladuj adres Odb do rstemp
+ cpi rstemp,0
+    breq  zeruj
+ rcall wyslij_enter
+
  rcall pusty_udr0                                           'sprawdz czy udr0 pusty
  cpi rstemp,10                                              'porownaj adro z 10
    brlo cyfry                                               'jezeli mniejszy to drukuj cyfry, jezeli nie, litery
@@ -278,3 +271,17 @@ ret
       Led = 0
       !wyslij:
       ret
+
+!wyslij_enter:
+ldi rsdata, 10                                              'wyslij trzy znaki: przejscia do kolejnej linii->idz na poczatek linii->wydrukuj 0
+ rcall pusty_udr0
+  !out udr0,rsdata
+
+ldi rsdata, 13
+ rcall pusty_udr0
+  !out udr0,rsdata
+
+ldi rsdata, 48
+ rcall pusty_udr0
+  !out udr0,rsdata
+ret
