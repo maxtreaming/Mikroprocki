@@ -55,11 +55,11 @@ Dim Adrw As Byte                                            'adres w³asny
 Dim Adro As Byte
 Dim Bajt As Byte                                            'adres odbiorcy 0...15
 Const Bof_bit = &B11000000
-Const Bofm_bit = &B10000000
+Const Bofm_bit = &B10000100
 Const Bofmaster_bit = &B11000010
 Const Bofs_bit = &B11000100
 
-Const Eof_bit = &B10000000
+Const Eofs_bit = &B10000100
 Const Eofm_bit = &B10100010
 
 Dim Stanodbioru As Byte
@@ -108,20 +108,18 @@ Return
    lDs rstemp, {stanodbioru}
    cpi rstemp,1
       breq koniec_ramki
-
-   subi rsdata,bof_bit
-
-      sbic sreg,2
+   cpi rsdata,bofm_bit
+      sbis sreg,1
   ret
-   sts {adrw},rsdata
+
    ldi rstemp,1
    sts {stanodbioru},rstemp
   ret
 
    !koniec_ramki:
-   subi rsdata,eof_bit
-      sbic sreg,2
-     ret
+     cpi rsdata, eofm_bit
+      sbis sreg,1
+     Ret
       ldi rstemp,0
       sts {stanodbioru},rstemp
 
@@ -145,8 +143,7 @@ Return
       sbiS ucsra,udre                                       'petla gdy udre1 jest zajety
       rjmp pusty_UDR1
 
-      lds rstemp,{adrw}
-      subi rstemp,eof_bit
+      ldi rstemp,eofs_bit
       !out udr,rstemp
    ret
 
