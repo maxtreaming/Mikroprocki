@@ -44,6 +44,12 @@ Dim Adro As Byte                                            'adres odbiorcy 0...
 Dim Nrodbiornika As Byte                                    'wskaznik do adresu odbiorcy w eeprom
 Dim Pomocnicza As Byte                                      'zmienna pomocnicza
 Dim Stan As Byte
+Dim Sekundy As Byte
+Dim Minuty As Byte
+Dim Godziny As Byte
+Sekundy = 0
+Minuty = 0
+godziny=0
 Stan = 0                                                    'ramka bof
 Const Bof_bit = &B110000000                                 'unikalna ramka bof dla mastera.
 Const Bofm_bit = &B11000010
@@ -96,6 +102,7 @@ On Oc0a Timer0_interrupt Nosave
 
 Enable Oc1a
 Enable Oc0a
+
 
 rcall RTC_init
 
@@ -161,6 +168,7 @@ Usart1_tx_end:                                              'przerwanie konca wy
 Return
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Timer1_interrupt:                                           'T=1s
+   rcall zegar
    rcall dioda                                              'kontrolne miganie diody co 1s.
    Start Timer0                                             'wlaczenie timera wyliczajacego okresy odbioru danych
 
@@ -335,4 +343,21 @@ I2cinit
    I2cwbyte &H0D
    I2cwbyte &B10000011
    I2cstop
+
+ret
+
+
+!Zegar:
+   I2cstart
+   I2cwbyte 162
+   I2cwbyte 2
+   I2cstart
+   I2cwbyte 163
+   I2crbyte Sekundy , Ack
+   I2crbyte Minuty , Ack
+   I2crbyte Godziny , Nack
+   I2cstop
+
+   Print
+   Print Makedec(godziny) ; ":" ; Makedec(minuty) ; ":" ; Makedec(sekundy)
 ret
