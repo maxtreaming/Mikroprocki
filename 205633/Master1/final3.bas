@@ -17,7 +17,7 @@ $crystal = Fcrystal
 
 $eeprom                                                     'zawartoœæ eeprom wgrywana na zasadzie programowania
 Data 15 , 14 , 13 , 1 , 9 , 11 , 8 , 6 , 4 , 0 , 0 , 0 , 0 , 0 , 0 , 0,       '0...15  wartosci w komorkach, to adresy urzadzen
-Data 18 , 22 , 19 , 22 , 18 , 20 , 20 , 20 , 24 , 6 , 6 , 6 , 6 , 6 , 6 , 6       'ile bajtow odbieramy od urzadzenia = (bof +ilosc danych+eof)+12 aby byc pewnym ze sie zmiesci . Min okolo 6
+Data 18 , 22 , 19 , 50 , 18 , 20 , 20 , 20 , 24 , 6 , 6 , 6 , 6 , 6 , 6 , 6       'ile bajtow odbieramy od urzadzenia = (bof +ilosc danych+eof)+12 aby byc pewnym ze sie zmiesci . Min okolo 6
 
 $data
 
@@ -96,6 +96,8 @@ On Oc0a Timer0_interrupt Nosave
 
 Enable Oc1a
 Enable Oc0a
+
+rcall RTC_init
 
 Start Timer1
 Start Timer0
@@ -280,17 +282,17 @@ ret
    sbrs rsdata,7
    !out udr0,rsdata
     ret
-
+''''''''''''''''''''''''''''''''''''''''''
 !pusty_udr1:
 sbis ucsr1a,udre1                                           'petla gdy udre1 jest zajety
    rjmp pusty_UDR1
 ret
-
+''''''''''''''''''''''''''''''''''''''''''
 !pusty_UDR0:
    sbis ucsr0a,udre0                                        'petla gdy udre0 jest zajety
    rjmp pusty_UDR0
 ret
-
+''''''''''''''''''''''''''''''''''''''''''
 !dioda:                                                     'zmiana stanu diody
    Sbis portd,led_pin
       rjmp zapal_led
@@ -303,7 +305,7 @@ ret
       Led = 0
       !wyslij:
       ret
-
+''''''''''''''''''''''''''''''''''''''''''
 !wyslij_enter:
 ldi rsdata, 10                                              'wyslij trzy znaki: przejscia do kolejnej linii->idz na poczatek linii->wydrukuj 0
  rcall pusty_udr0
@@ -316,4 +318,21 @@ ldi rsdata, 13
 ldi rsdata, 48
  rcall pusty_udr0
   !out udr0,rsdata
+ret
+''''''''''''''''''''''''''''''''''''''''''
+!RTC_init:
+Config Sda = Portc.1
+Config Scl = Portc.0
+I2cinit
+   I2cstart
+   I2cwbyte 162
+   I2cwbyte 0
+   I2cwbyte 0
+   I2cstop
+
+   I2cstart
+   I2cwbyte 162
+   I2cwbyte &H0D
+   I2cwbyte &B10000011
+   I2cstop
 ret
