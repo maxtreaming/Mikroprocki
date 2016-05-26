@@ -44,12 +44,17 @@ Dim Adro As Byte                                            'adres odbiorcy 0...
 Dim Nrodbiornika As Byte                                    'wskaznik do adresu odbiorcy w eeprom
 Dim Pomocnicza As Byte                                      'zmienna pomocnicza
 Dim Stan As Byte
+
+
 Dim Sekundy As Byte
 Dim Minuty As Byte
 Dim Godziny As Byte
+Const Aktualizacja_godziny = 1
 Sekundy = 0
-Minuty = 0
-godziny=0
+Minuty = 57
+Godziny = 20
+
+
 Stan = 0                                                    'ramka bof
 Const Bof_bit = &B110000000                                 'unikalna ramka bof dla mastera.
 Const Bofm_bit = &B11000010
@@ -344,8 +349,26 @@ I2cinit
    I2cwbyte &B10000011
    I2cstop
 
-ret
+   ldi rstemp, aktualizacja_godziny
+   sbrs rstemp,0
+   ret
 
+   Sekundy = Makebcd(sekundy)
+   Minuty = Makebcd(minuty)
+   Godziny = Makebcd(godziny)
+
+   I2cstart
+   I2cwbyte 162
+   I2cwbyte 2
+   I2cwbyte Sekundy
+   I2cwbyte Minuty
+   I2cwbyte Godziny
+   I2cstop
+
+
+
+ret
+''''''''''''''''''''''''''''''''''''''''''
 
 !Zegar:
    I2cstart
@@ -357,7 +380,10 @@ ret
    I2crbyte Minuty , Ack
    I2crbyte Godziny , Nack
    I2cstop
-
+   Godziny = Makedec(godziny)
+   Minuty = Makedec(minuty)
+   Sekundy = Makedec(sekundy)
    Print
-   Print Makedec(godziny) ; ":" ; Makedec(minuty) ; ":" ; Makedec(sekundy)
+   Print Spc(3) ; Godziny ; ":" ; Minuty ; ":" ; Sekundy
 ret
+''''''''''''''''''''''''''''''''''''''''''
