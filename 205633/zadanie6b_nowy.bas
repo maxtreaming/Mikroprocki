@@ -28,9 +28,6 @@ Rsdata Alias R19
 Te_pin Alias 5
 Te Alias Portd.te_pin                                       'sterowanie przep³ywem w nadajniku/odbiorniku linii
 
-'Led_reg Alias Ddrd  'rejestr kontrolki nadawania, gdy anoda LED -> Ucc
-'Led_reg Alias Portd 'rejestr kontrolki nadawania, gdy katoda LED -> GND
-'Led_pin Alias 7     'numer wyprowadzenia portu dla kontrolki
 
 On Urxc Usart0_rx Nosave                                    'deklaracja przerwania URXC (odbiór znaku USART0)
 On Urxc1 Usart1_rx Nosave                                   'deklaracja przerwania URXC1 (odbiór znaku USART1)
@@ -42,7 +39,8 @@ Dim Adro As Byte                                            'adres odbiorcy 0...
 Dim Tabin(50) As Byte                                       'tabela znaków odebranych
 Const Lstrmax = 24                                          'maksymalna liczba znaków w tabin
 Dim Lstr As Byte                                            'liczba odebranych znaków z USART0
-Const Bof_bit = &B1010000
+Const Bof_bit = &B11000000
+Const Eof_bit = &B10000000
 
 
 'zmniejszenie czêstotliwoœci taktowania procesora
@@ -56,8 +54,7 @@ rcall usart_init                                            'inicjalizacja USART
 Sei                                                         'w³¹czenie globalnie przerwañ
 
 Readeeprom Adrw , 16
-'Adrw = 10
-Print "Moj adres: " ; Adrw
+
 
 Do
    'inne procedury
@@ -105,24 +102,14 @@ Usart1_rx:                                                  'etykieta bascomowa 
 Return                                                      '
 
 !rs_rx:
-   in rsdata,udr0                                           'odebrany znak z komputera swojego
-   'znaki s¹ zapisywane z buforze tabin()  do odbioru 13
-   cpi rsdata,13
-   breq rec13
-      lds rstemp,{lstr}
-      cpi rstemp,lstrmax
-      sbis sreg,2                                           'obejœcie gdy liczba mniejsza od lstrmax
-         Ret                                                'wyjœcie gdy odebrano ponad Lstrmax znaków
-      inc rstemp
-      sts {lstr},rstemp
-      dec rstemp
-      Loadadr Tabin(1) , Y
-      add yl,rstemp
-      ldi rstemp,0
-      adc yh,rstemp                                         'w Y adres zapisu do tabin
-      st y+,rsdata
-      st y,rstemp                                           'wpisnie 0 na koñcu - oznaczenie koñca ³añcucha
-   ret
+   in rsdata,udr1
+   mov rstemp, rsdata                                      'odebranie danych z linii
+   subi rstemp, 127
+   sbis sreg,2
+   rjmp sprawdz_status
+
+   rcall sprawdz_adres
+    'cokolowiek
 
 !rec13:
    ldi rstemp,0

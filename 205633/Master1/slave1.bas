@@ -55,7 +55,7 @@ Dim Adrw As Byte                                            'adres w³asny
 Dim Adro As Byte
 Dim Bajt As Byte                                            'adres odbiorcy 0...15
 Const Bof_bit = &B11000000
-Const Bofm_bit = &B10000100
+Const Bofm_bit = &B11000100
 Const Bofmaster_bit = &B11000010
 Const Bofs_bit = &B11000100
 
@@ -66,6 +66,7 @@ Dim Stanodbioru As Byte
 Stanodbioru = 0
 
 SBI Ddrd,Led_pin
+
 
 rcall usart_init                                            'inicjalizacja USARTów i w³¹czenie przerwañ
 Sei                                                         'w³¹czenie globalnie przerwañ
@@ -108,10 +109,13 @@ Return
    lDs rstemp, {stanodbioru}
    cpi rstemp,1
       breq koniec_ramki
-   cpi rsdata,bofm_bit
-      sbis sreg,1
+
+
+      sbrs rsdata,6
   ret
 
+   subi rsdata,bof_bit
+   sts {adrw},rsdata
    ldi rstemp,1
    sts {stanodbioru},rstemp
   ret
@@ -126,8 +130,8 @@ Return
       Te = 1
       ldi rstemp,bofmaster_bit
       !out udr,rstemp
-
-      ldi rstemp,48
+      lds rstemp,{adrw}
+      subi rstemp,-48
       !wyslij_liczby:
 
       !pusty_UDR:
@@ -136,14 +140,15 @@ Return
 
       !out udr,rstemp
       inc rstemp
-      cpi rstemp,58
+      cpi rstemp,58+16
          brne wyslij_liczby
 
       !pusty_UDR1:
       sbiS ucsra,udre                                       'petla gdy udre1 jest zajety
       rjmp pusty_UDR1
 
-      ldi rstemp,eofs_bit
+      lds rstemp,{adrw}
+      ori rstemp,128
       !out udr,rstemp
    ret
 

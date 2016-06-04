@@ -1,6 +1,6 @@
-Report       : final3
-Date         : 06-04-2016
-Time         : 12:57:52
+Report       : zadanie6b_nowy
+Date         : 05-21-2016
+Time         : 15:36:04
 
 Compiler     : BASCOM-AVR LIBRARY V 2.0.7.3
 Processor    : M644P
@@ -8,11 +8,11 @@ SRAM         : 1000 hex
 EEPROM       : 800 hex
 ROMSIZE      : 10000 hex
 
-ROMIMAGE     : 616 hex  -> Will fit into ROM
-ROMIMAGE     :  1558 dec
-FLASH USED   :  2  %
+ROMIMAGE     : 354 hex  -> Will fit into ROM
+ROMIMAGE     :  852 dec
+FLASH USED   :  1  %
 BAUD         : 115200 Baud
-XTAL         : 3686400 Hz
+XTAL         : 14745600 Hz
 BAUD error   : 0.%
 
 Stack start  : 10FF hex
@@ -21,7 +21,7 @@ S-Stacksize  : 10 hex
 S-Stackstart : 10D8 hex
 Framesize    : 20 hex
 Framestart   : 10A8 hex
-Space left   :  3966  dec
+Space left   :  3954  dec
 
 LCD DB7      : PORTB.7
 LCD DB6      : PORTB.6
@@ -66,15 +66,8 @@ PWM2B                            Byte              00B4          180
 ERR                              Bit               0006          6 
 ADRW                             Byte              0100          256 
 ADRO                             Byte              0101          257 
-NRODBIORNIKA                     Byte              0102          258 
-POMOCNICZA                       Byte              0103          259 
-STAN                             Byte              0104          260 
-ADRES                            Byte (16)         0105          261 
-CZAS                             Byte (16)         0115          277 
-SEKUNDY                          Byte              0125          293 
-MINUTY                           Byte              0126          294 
-GODZINY                          Byte              0127          295 
-STANODBIORU                      Byte              0128          296 
+TABIN                            Byte (50)         0102          258 
+LSTR                             Byte              0134          308 
 
 --------------------------------------------------------------------------------
 Constant                         Value
@@ -842,7 +835,7 @@ _RAMSIZE                         4096
 _ERAMSIZE                        2048
 _SIM                             0
 _BASE                            1
-_XTAL                            3686400
+_XTAL                            14745600
 _BUILD                           20730
 _COMPILER                        90
 _HWMUL                           1
@@ -860,26 +853,14 @@ _HWSTACK_LOW                      4311
 _SWSTACK_LOW                      4296
 _FRAME_HIGH                       4296
 _XMEGA                           0
-PRESCFC                          2
-FCRYSTAL                          3686400
+PRESCFC                          0
+FCRYSTAL                          14745600
 BAUNDRS0                         115200
-_UBRR0                            1
+_UBRR0                            7
 BAUNDRS1                         115200
-_UBRR1                            1
-AKTUALIZACJA_GODZINY             1
-BOF_BIT                          &B110000000
-BOFM_BIT                         &B11000010
-EOF_BIT                          &B10000000
-EOFM_BIT                         &B10100010
-_PRESCTIMER1                     256
-_FPR1                            1
-_OCRTIMER1                        14399
-_PRESCTIMER0                     1024
-_FPR0                            1
-_OCRTIMER0                       1
-_SDA                             1
-_SCL                             0
-___I2CDELAY                      5
+_UBRR1                            7
+LSTRMAX                          24
+BOF_BIT                          &B10100000
 
 
 --------------------------------------------------------------------------------
@@ -888,6 +869,7 @@ Warnings:
 UBRR0                            not used
 UBRR                             not used
 OCR1B                            not used
+OCR1A                            not used
 ICR1                             not used
 TCNT1                            not used
 ADC                              not used
@@ -901,6 +883,8 @@ PWM0B                            not used
 PWM2A                            not used
 PWM2B                            not used
 
+Using Y pointer, make sure to save/restore  in line  116 
+Using Y pointer, make sure to save/restore  in line  129 
 
 Eeprom binary image map
 --------------------------------------------------------------------------------
