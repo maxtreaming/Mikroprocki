@@ -55,12 +55,12 @@ Dim Adrw As Byte                                            'adres w³asny
 Dim Adro As Byte
 Dim Bajt As Byte                                            'adres odbiorcy 0...15
 Const Bof_bit = &B11000000
-Const Bofm_bit = &B11000100
-Const Bofmaster_bit = &B11000010
+Const Bofm_bit = &B11000111
+Const Bofmaster_bit = &B11000111
 Const Bofs_bit = &B11000100
 
 Const Eofs_bit = &B10000100
-Const Eofm_bit = &B10100010
+Const Eofm_bit = &B10100111
 
 Dim Stanodbioru As Byte
 Stanodbioru = 0
